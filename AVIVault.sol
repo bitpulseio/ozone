@@ -44,30 +44,39 @@ contract AVIVault is ERC4626, ReentrancyGuard, Ownable2Step {
     // --- Immutable configuration ---
     IAavePool public immutable aavePool;
     IAToken   public immutable aToken;      // aToken corresponding to `asset()`
+    address   public immutable feesWallet;   // Wallet to receive fees
+    uint256   public immutable feePercentage; // Fee percentage in basis points (e.g., 100 = 1%)
 
     // --- Vault controls ---
     bool     public depositsDisabled;       // circuit breaker (deposits only)
     uint256  public tvlCap;                 // 0 = no cap; else max totalAssets() allowed
+    uint256  public totalPrincipal;        // Total principal deposited (excluding yield)
 
     // --- Events ---
     event DepositsDisabled(bool disabled);
     event CapUpdated(uint256 newCap);
+    event FeesCollected(address indexed feesWallet, uint256 amount);
 
     // --- Errors ---
     error DepositsDisabledErr();
     error CapExceeded();
     error ZeroAddress();
+    error InvalidFeePercentage();
 
     /**
      * @param underlying ERC20 asset accepted by Aave market (e.g., USDC)
      * @param _aavePool  Aave v3 Pool (IPool) address
      * @param _aToken    The aToken address corresponding to `underlying`
+     * @param _feesWallet Address to receive fees
+     * @param _feePercentage Fee percentage in basis points (e.g., 100 = 1%, max 10000 = 100%)
      * @param assetSymbol Symbol suffix for share token branding (e.g., "USDC")
      */
     constructor(
         IERC20 underlying,
         address _aavePool,
         address _aToken,
+        address _feesWallet,
+        uint256 _feePercentage,
         string memory assetSymbol // e.g., "USDC" — pass from a factory/deployer
     )
         // Bitpulse-branded per-vault claim token (your "Bitpulse Token" for this asset)
@@ -79,8 +88,13 @@ contract AVIVault is ERC4626, ReentrancyGuard, Ownable2Step {
         Ownable(msg.sender)
     {
         if (_aavePool == address(0) || _aToken == address(0)) revert ZeroAddress();
+        if (_feesWallet == address(0)) revert ZeroAddress();
+        if (_feePercentage > 10000) revert InvalidFeePercentage();
+        
         aavePool = IAavePool(_aavePool);
         aToken   = IAToken(_aToken);
+        feesWallet = _feesWallet;
+        feePercentage = _feePercentage;
     }
 
     // =========================================================================
@@ -111,13 +125,62 @@ contract AVIVault is ERC4626, ReentrancyGuard, Ownable2Step {
     }
 
     /**
-     * @dev Override _withdraw to withdraw from Aave before transferring assets
+     * @dev Override _withdraw to withdraw from Aave, calculate fees on yield, and transfer assets
      */
     function _withdraw(address caller, address receiver, address owner, uint256 assets, uint256 shares) internal override {
-        // Withdraw from Aave before withdrawal
+        // Calculate fees on earned yield BEFORE withdrawing from Aave
+        uint256 fee = 0;
+        uint256 totalShares = totalSupply();
+        uint256 assetsBeforeWithdraw = totalAssets(); // Store assets before withdrawal
+        
+        // Calculate fees on earned yield only
+        if (totalShares > 0 && totalPrincipal < assetsBeforeWithdraw) {
+            // Calculate total yield in the vault (before withdrawal)
+            uint256 totalYield = assetsBeforeWithdraw - totalPrincipal;
+            
+            // Calculate user's share of the yield
+            // userYieldShare = (shares / totalShares) * totalYield
+            uint256 userYieldShare = (shares * totalYield) / totalShares;
+            
+            // Calculate fee on yield: fee = userYieldShare * feePercentage / 10000
+            fee = (userYieldShare * feePercentage) / 10000;
+            
+            // Update totalPrincipal: reduce by the principal portion of withdrawal
+            // principalPortion = assets - userYieldShare
+            uint256 principalPortion = assets - userYieldShare;
+            if (totalPrincipal >= principalPortion) {
+                totalPrincipal -= principalPortion;
+            } else {
+                // Edge case: if calculation error, set to 0
+                totalPrincipal = 0;
+            }
+        } else {
+            // No yield or first withdrawal, no fee
+            // Update totalPrincipal
+            if (totalPrincipal >= assets) {
+                totalPrincipal -= assets;
+            } else {
+                totalPrincipal = 0;
+            }
+        }
+        
+        // Withdraw from Aave
         aavePool.withdraw(address(asset()), assets, address(this));
         
-        super._withdraw(caller, receiver, owner, assets, shares);
+        // Transfer fee to fees wallet if any
+        if (fee > 0) {
+            IERC20(asset()).transfer(feesWallet, fee);
+            emit FeesCollected(feesWallet, fee);
+        }
+        
+        // Transfer remaining assets to receiver
+        uint256 userAmount = assets - fee;
+        IERC20(asset()).transfer(receiver, userAmount);
+        
+        // Burn shares
+        _burn(owner, shares);
+        
+        emit Withdraw(caller, receiver, owner, userAmount, shares);
     }
 
     // =========================================================================
@@ -148,6 +211,9 @@ contract AVIVault is ERC4626, ReentrancyGuard, Ownable2Step {
             if (nextAssets > tvlCap) revert CapExceeded();
         }
         super._deposit(caller, receiver, assets, shares);
+        
+        // Track principal deposited
+        totalPrincipal += assets;
         
         // Supply to Aave after deposit
         _safeApproveMax(address(asset()), address(aavePool), assets);

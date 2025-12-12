@@ -1,0 +1,34 @@
+{
+  "name": "ozone",
+  "version": "1.0.0",
+  "description": "**A simplified, composable risk layer for DeFi.**  \r Bitpulse Ozone connects users to leading DeFi protocols like AAVE and Uniswap through minimal ERC-4626 vaults, continuously monitored off-chain by Bitpulse’s risk engine.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --timeout 60000",
+    "compile": "node scripts/compile.js",
+    "deploy:sepolia": "node scripts/deploy-sepolia.js",
+    "deposit:sepolia": "node scripts/deposit-sepolia.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitpulseio/ozone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bitpulseio/ozone/issues"
+  },
+  "homepage": "https://github.com/bitpulseio/ozone#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.4",
+    "ganache": "^7.9.2",
+    "mocha": "^10.7.3",
+    "solc": "^0.8.24"
+  }
+}

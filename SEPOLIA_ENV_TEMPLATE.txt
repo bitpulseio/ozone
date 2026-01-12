@@ -20,3 +20,14 @@ VERIFY_ON_ETHERSCAN=true
 DEPOSIT_AMOUNT=1.0
 DEPOSIT_RECEIVER=
 
+# Withdraw script config
+# Note: Maple withdrawals are queued/asynchronous. This submits a withdraw request and prints WithdrawalRequested events.
+WITHDRAW_AMOUNT=1.0
+WITHDRAW_RECEIVER=
+# Optional: if owner != signer, you must have ERC4626 share allowance from owner -> signer
+WITHDRAW_OWNER=
+# Optional: force-send without estimateGas
+WITHDRAW_GAS_LIMIT=
+# Optional: override safety checks and broadcast even if staticCall/maxWithdraw fail (will waste gas if it reverts)
+WITHDRAW_FORCE_SEND=false
+

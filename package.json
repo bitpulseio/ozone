@@ -8,7 +8,8 @@
     "compile": "node scripts/compile.js",
     "deploy:sepolia": "node scripts/deploy-sepolia.js",
     "deposit:sepolia": "node scripts/deposit-sepolia.js",
-    "withdraw:sepolia": "node scripts/withdraw-sepolia.js"
+    "withdraw:sepolia": "node scripts/withdraw-sepolia.js",
+    "hardhat:compile": "hardhat compile"
   },
   "repository": {
     "type": "git",

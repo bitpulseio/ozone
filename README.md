@@ -29,7 +29,7 @@ This repo is **MVP-stage** but **mainnet-intended**: it includes an explicit thr
 ### Node (solc + mocha + ganache)
 
 ```bash
-npm ci
+npm install
 npm run compile
 npm test
 ```

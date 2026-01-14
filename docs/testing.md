@@ -9,7 +9,7 @@ This repo supports:
 ## Local tests (mocha + ganache)
 
 ```bash
-npm ci
+npm install
 npm test
 ```
 

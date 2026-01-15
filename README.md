@@ -1,4 +1,4 @@
-# Bitpulse Ozone — ERC-4626 vaults for DeFi protocols
+# 🌍 Bitpulse Ozone — ERC-4626 vaults for DeFi protocols
 
 Bitpulse Ozone is a small set of **ERC-4626 vaults** that route deposits into third-party protocols (e.g., Aave, Maple/Syrup) while keeping on-chain logic minimal and auditable.
 

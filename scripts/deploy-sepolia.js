@@ -2,7 +2,6 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const { ethers } = require("ethers");
-const { verifyOnEtherscan } = require("./verify-etherscan");
 
 function mustEnv(name) {
   const v = process.env[name];
@@ -29,7 +28,16 @@ async function main() {
   const feeBps = BigInt(process.env.FEE_BPS || "100");
   const assetSymbol = process.env.ASSET_SYMBOL || "USDC";
 
-  const artifactPath = path.join(__dirname, "..", "artifacts", "MapleVault.json");
+  const artifactPath = path.join(
+    __dirname,
+    "..",
+    "artifacts-hardhat",
+    "contracts",
+    "vaults",
+    "maple",
+    "MapleVault.sol",
+    "MapleVault.json"
+  );
   const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
 
   // Constructor args:
@@ -43,15 +51,9 @@ async function main() {
   await contract.waitForDeployment();
   const addr = await contract.getAddress();
 
-  console.log(`Deployed MapleVaultAuthorized (MapleVault) at: ${addr}`);
-
-  const doVerify = (process.env.VERIFY_ON_ETHERSCAN || "").toLowerCase() === "true" && process.env.ETHERSCAN_API_KEY;
-  if (doVerify) {
-    console.log("Verifying on Sepolia Etherscan...");
-    await verifyOnEtherscan({ contractAddress: addr, constructorArgs: args });
-  } else {
-    console.log("Skipping Etherscan verify (set ETHERSCAN_API_KEY and VERIFY_ON_ETHERSCAN=true).");
-  }
+  console.log(`Deployed MapleVault (MapleVault) at: ${addr}`);
+  console.log("To verify with Hardhat:");
+  console.log(`npx hardhat verify --network sepolia ${addr} ${args.join(" ")}`);
 }
 
 main().catch((e) => {

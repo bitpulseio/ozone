@@ -2,11 +2,11 @@
 
 This repo supports:
 
-- **Local unit tests**: mocha + ganache (no Hardhat dependency required)
-- **Framework compilation**: Hardhat and Foundry
+- **Local unit tests**: Hardhat
+- **Hardhat compilation**: produces `artifacts-hardhat/`
 - **Sepolia smoke scripts**: deposit/withdraw against deployed contracts
 
-## Local tests (mocha + ganache)
+## Local tests (Hardhat)
 
 ```bash
 npm install
@@ -19,19 +19,12 @@ npm test
 npm run compile
 ```
 
-This writes `artifacts/*.json` used by `scripts/*-sepolia.js`.
+This writes `artifacts-hardhat/...` used by `scripts/*-sepolia.js`.
 
 ## Hardhat
 
 ```bash
 npx hardhat compile
-```
-
-## Foundry
-
-```bash
-forge build
-forge test
 ```
 
 ## Sepolia smoke testing (Maple/Syrup vault)

@@ -86,16 +86,29 @@ async function main() {
     receiver = signer;
   }
 
-  const artifactPath = path.join(__dirname, "..", "artifacts", "MapleVault.json");
+  const artifactPath = path.join(
+    __dirname,
+    "..",
+    "artifacts-hardhat",
+    "contracts",
+    "vaults",
+    "maple",
+    "MapleVault.sol",
+    "MapleVault.json"
+  );
   const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
   const vault = new ethers.Contract(vaultAddr, artifact.abi, wallet);
 
   // ABI sanity checks (prevents sending a blank-data tx)
   if (typeof vault.withdraw !== "function") {
-    throw new Error("Artifact ABI missing `withdraw(...)`. Re-run `npm run compile` and ensure artifacts/MapleVault.json matches the deployed contract.");
+    throw new Error(
+      "Artifact ABI missing `withdraw(...)`. Run `npx hardhat compile` and ensure artifacts-hardhat has MapleVault.json."
+    );
   }
   if (typeof vault.maxWithdraw !== "function" || typeof vault.maxRedeem !== "function") {
-    throw new Error("Artifact ABI missing ERC4626 view methods (maxWithdraw/maxRedeem). Re-run `npm run compile`.");
+    throw new Error(
+      "Artifact ABI missing ERC4626 view methods (maxWithdraw/maxRedeem). Run `npx hardhat compile`."
+    );
   }
 
   const usdcBefore = await usdc.balanceOf(receiver);

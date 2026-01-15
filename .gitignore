@@ -1,2 +1,6 @@
 node_modules
 .env
+artifacts-hardhat
+cache-hardhat
+artifacts
+dist

@@ -1,6 +1,6 @@
 # Deployment guide
 
-This repo supports deployment and smoke-testing via **Node scripts** (and compilation via Hardhat/Foundry).
+This repo supports deployment and smoke-testing via **Node scripts** (compiled via Hardhat).
 
 ## Environment
 
@@ -24,7 +24,7 @@ Vault config:
 
 ## Compile artifacts (Node scripts)
 
-The Node scripts use the `artifacts/` JSON written by:
+The Node scripts use the `artifacts-hardhat/` JSON written by:
 
 ```bash
 npm run compile
@@ -36,16 +36,16 @@ npm run compile
 npm run deploy:sepolia
 ```
 
-This deploy script expects `artifacts/MapleVault.json` and will print the deployed address.
+This deploy script expects the Hardhat artifact at:
+`artifacts-hardhat/contracts/vaults/maple/MapleVault.sol/MapleVault.json`
 
 ## Verify (optional)
 
-Set:
+Use Hardhat's verifier:
 
-- `ETHERSCAN_API_KEY`
-- `VERIFY_ON_ETHERSCAN=true`
-
-Then deploy again (the deploy script will auto-verify).
+```bash
+npx hardhat verify --network sepolia <deployed_address> <constructor_args...>
+```
 
 ## Operational notes
 

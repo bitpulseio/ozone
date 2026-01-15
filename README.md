@@ -2,7 +2,7 @@
 
 Bitpulse Ozone is a small set of **ERC-4626 vaults** that route deposits into third-party protocols (e.g., Aave, Maple/Syrup) while keeping on-chain logic minimal and auditable.
 
-This repo is **MVP-stage** but **mainnet-intended**: it includes an explicit threat model, invariants, and reproducible build/test flows for both Hardhat and Foundry users.
+This repo is **MVP-stage** but **mainnet-intended**: it includes an explicit threat model, invariants, and reproducible build/test flows for Hardhat users.
 
 ## Quick links
 
@@ -18,15 +18,15 @@ This repo is **MVP-stage** but **mainnet-intended**: it includes an explicit thr
 
 - **Production contracts**: [`contracts/`](contracts/)
   - Aave vaults: [`contracts/vaults/aave/`](contracts/vaults/aave/)
-  - Maple/Syrup vault: [`contracts/MapleVault.sol`](contracts/MapleVault.sol)
+  - Maple/Syrup vault: [`contracts/vaults/maple/`](contracts/vaults/maple/)
 - **Mocks** (tests only): [`contracts/mocks/`](contracts/mocks/)
 - **Node scripts** (Sepolia smoke tests): [`scripts/`](scripts/)
-- **Tests** (mocha + ganache): [`test/`](test/)
+- **Tests** (Hardhat): [`test/`](test/)
 - **Docs**: [`docs/`](docs/)
 
 ## Getting started
 
-### Node (solc + mocha + ganache)
+### Hardhat (compile + test)
 
 ```bash
 npm install
@@ -53,22 +53,7 @@ npm run withdraw:sepolia
 Notes:
 - Maple/Syrup withdrawals are typically **queued/asynchronous**. `withdraw` may emit `WithdrawalRequested` without an immediate USDC balance increase. See [`docs/testing.md`](docs/testing.md).
 
-### Hardhat
-
-```bash
-npx hardhat compile
-```
-
-Hardhat artifacts are written to `artifacts-hardhat/` to avoid colliding with the Node `solc` artifacts used by scripts.
-
-### Foundry
-
-```bash
-forge build
-forge test
-```
-
-Foundry is configured to treat `contracts/` as the source directory (no duplicate contract copies).
+Hardhat artifacts are written to `artifacts-hardhat/`.
 
 ## Sepolia deployments
 

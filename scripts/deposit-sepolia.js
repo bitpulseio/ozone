@@ -52,7 +52,16 @@ async function main() {
     throw new Error(`Insufficient USDC. Need ${amountStr}, have ${ethers.formatUnits(bal, decimals)}`);
   }
 
-  const artifactPath = path.join(__dirname, "..", "artifacts", "MapleVault.json");
+  const artifactPath = path.join(
+    __dirname,
+    "..",
+    "artifacts-hardhat",
+    "contracts",
+    "vaults",
+    "maple",
+    "MapleVault.sol",
+    "MapleVault.json"
+  );
   const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
   const vault = new ethers.Contract(vaultAddr, artifact.abi, wallet);
 

@@ -4,8 +4,8 @@
   "description": "**A simplified, composable risk layer for DeFi.**  \r Bitpulse Ozone connects users to leading DeFi protocols like AAVE and Uniswap through minimal ERC-4626 vaults, continuously monitored off-chain by Bitpulse’s risk engine.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --timeout 60000",
-    "compile": "node scripts/compile.js",
+    "test": "hardhat test",
+    "compile": "hardhat compile",
     "deploy:sepolia": "node scripts/deploy-sepolia.js",
     "deposit:sepolia": "node scripts/deposit-sepolia.js",
     "withdraw:sepolia": "node scripts/withdraw-sepolia.js"
@@ -28,8 +28,12 @@
     "chai": "^4.5.0",
     "dotenv": "^16.4.5",
     "ethers": "^6.13.4",
-    "ganache": "^7.9.2",
-    "mocha": "^10.7.3",
-    "solc": "^0.8.24"
+    "hardhat": "^2.22.16",
+    "@nomicfoundation/hardhat-ethers": "^3.0.5",
+    "@nomicfoundation/hardhat-verify": "^2.0.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "@types/node": "^20.12.12",
+    "@types/chai": "^4.3.12"
   }
 }
